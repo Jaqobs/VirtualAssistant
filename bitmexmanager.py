@@ -3,6 +3,11 @@ import requests
 import ccxt
 import time
 import logging
+import os
+
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 
 cp = configparser.RawConfigParser()  
 cp.read('config.txt')
