@@ -1,6 +1,7 @@
 import os
 import logging
 import time
+import configparser
 
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
@@ -22,8 +23,11 @@ def main():
     logging.info('Virtual Assistent started.')
     logging.info('Working directory: {}'.format(dname))
 
+    cp = configparser.RawConfigParser()  
+    cp.read('config.txt')
+
     #create updater and pass token
-    updater = Updater(token='674576910:AAG1zR1LV0yMdm9v2DWei4Jla_PgLwskkzY')
+    updater = Updater(token=cp.get('telegram', 'TOKEN'))
 
     #Dispatcher to register handlers
     dispatcher = updater.dispatcher
