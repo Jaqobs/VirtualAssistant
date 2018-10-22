@@ -8,7 +8,7 @@ def main():
     os.chdir(dname)
     print(sys.path[0])
     print(dname)
-
+    print('Current path: {}'.format(os.getcwd()))
     time.sleep(100000)
 
 if __name__ == '__main__':

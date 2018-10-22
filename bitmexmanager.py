@@ -1,4 +1,5 @@
 import configparser
+import requests
 import ccxt
 import time
 import logging
@@ -46,6 +47,28 @@ def get_last_price(symbol):
 	logging.info('Last price: {}'.format(ticker['last']))
 
 	return ticker['last']
+
+
+def get_funding(symbol):
+    funding = {}
+    url = 'https://www.bitmex.com/api/v1/instrument?'
+    params = dict(
+        symbol=symbol,
+        count='1',
+        reverse='true',
+        )
+
+    logging.debug('Sending request')
+    resp = requests.get(url=url, params=params)
+    data = resp.json() # Check the JSON Response Content documentation below
+    
+    funding['symbol'] =  data[0]['symbol']
+    funding['fundingTimestamp'] = data[0]['fundingTimestamp']
+    funding['fundingRate'] = data[0]['fundingRate']
+    funding['indicativeFundingRate'] = data[0]['indicativeFundingRate']
+    logging.info(funding)
+
+    return funding
 
 
 def get_all_positions():
