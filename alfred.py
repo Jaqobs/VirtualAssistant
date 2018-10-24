@@ -6,10 +6,10 @@ import ssl
 
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
-from currency_converter import CurrencyConverter
 
 import bitmexmanager as bitmex
 import msfeed
+from curconverter import currency_converter as c
 
 def main():
     #set path
@@ -103,12 +103,12 @@ def currency_converter(bot, update, args):
     if hasattr(ssl, '_create_unverified_context'):
         ssl._create_default_https_context = ssl._create_unverified_context
     logging.debug(args)
-    value = int(args[0])
-    scurrency = args[1].upper()
-    tcurrency = args[2].upper()
-    c = CurrencyConverter('http://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip')
-    result = c.convert(value, scurrency, tcurrency)
-    text = '{0} {1} = {2:.2f} {3}'.format(value, scurrency, result, tcurrency)
+    value = float(args[0])
+    source = args[1].upper()
+    target = args[2].upper()
+    
+    result = c(value, source, target)
+    text = '{0} {1} = {2:.2f} {3}'.format(value, source, result, target)
     bot.send_message(chat_id=update.message.chat_id, text=text)
 
 

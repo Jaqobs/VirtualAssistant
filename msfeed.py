@@ -1,5 +1,4 @@
 import feedparser
-import requests
 import ssl
 import logging
 
