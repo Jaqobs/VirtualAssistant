@@ -20,7 +20,8 @@ def currency_converter(value, source, target):
             'Target currency: {}'.format(value, source, target))
 
     if (source not in 'VND' and target not in 'VND'):  
-        c = CurrencyConverter('http://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip')
+        c = CurrencyConverter(
+            'http://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip')
         result = c.convert(value, source, target)
     else:
         url = 'https://www.vietcombank.com.vn/ExchangeRates/ExrateXML.aspx'

@@ -62,7 +62,7 @@ def start(bot, update):
 
 
 def help(bot, update):
-    command_list = ['/start', '/manga', '/btc', '/funding', 
+    command_list = ['/manga', '/btc', '/currency value base target', 
                     '/bitmex_cancel_orders'
                     ]
     logging.info('Help requested.')
@@ -104,11 +104,11 @@ def currency_converter(bot, update, args):
         ssl._create_default_https_context = ssl._create_unverified_context
     logging.debug(args)
     value = float(args[0])
-    source = args[1].upper()
+    base = args[1].upper()
     target = args[2].upper()
     
-    result = c(value, source, target)
-    text = '{0} {1} = {2:.2f} {3}'.format(value, source, result, target)
+    result = c(value, base, target)
+    text = '{0:.2f} {1} = {2:.2f} {3}'.format(value, base, result, target)
     bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
