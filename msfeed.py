@@ -8,14 +8,23 @@ def check_manga():
 
     url = 'https://readms.net/rss'
     feed = feedparser.parse(url)
-    mangalist = ['One Piece', 'My Hero Academia', 'One-Punch Man', 'Attack on Titan', 'The Promised Neverland']
-    answer = ''
+    mangalist = [
+                 'One Piece', 'My Hero Academia', 'One-Punch Man', 
+                 'Attack on Titan', 'Boruto', 'Shokugeki no Souma',
+                 'The Promised Neverland'
+                ]
 
+    res = []
     #check items in feed
     for item in feed.entries:
         for manga in mangalist:
             if manga in str(item.title):
-                answer += str(item.title) + ' ' + str(item.updated) + '\n' + str(item.link) + '\n---------------------\n'
-                logging.info('{} - last updated: {}'.format(str(item.title), str(item.updated)))
+                res.append({'title' : str(item.title), 
+                            'timestamp' : str(item.updated), 
+                            'url' : str(item.link)
+                           })
+                logging.info('{} - last updated: {}'.format(str(item.title), 
+                                                            str(item.updated))
+                            )
 
-    return answer
+    return res

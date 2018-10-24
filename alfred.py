@@ -95,7 +95,14 @@ def bitmex_cancel_orders(bot, update):
 def manga(bot, update):
     logging.info('Manga updates requested.')
     manga_update = msfeed.check_manga()
-    bot.send_message(chat_id=update.message.chat_id, text=manga_update)
+    text = ''
+    logging.debug(manga_update)
+    for item in manga_update:
+        text += ('{0} - {1} \n{2} \n------\n'.format(item['title'], 
+                                                  item['timestamp'], 
+                                                  item['url']
+                                                 ))
+    bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
 def currency_converter(bot, update, args):
