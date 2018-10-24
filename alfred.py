@@ -2,9 +2,11 @@ import os
 import logging
 import time
 import configparser
+import ssl
 
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
+from currency_converter import CurrencyConverter
 
 import bitmexmanager as bitmex
 import msfeed
@@ -19,7 +21,8 @@ def main():
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         handlers=[
-                            logging.FileHandler('{0}.log'.format(time.strftime("alfred-%Y-%m-%d"))),
+                            logging.FileHandler('{0}.log'.format(
+                                time.strftime("alfred-%Y-%m-%d"))),
                             logging.StreamHandler()
                             ]
                         )
@@ -41,10 +44,11 @@ def main():
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('help', help))
     dispatcher.add_handler(CommandHandler('btc', btc))
-    dispatcher.add_handler(CommandHandler('last_price', btc_last_price))
-    dispatcher.add_handler(CommandHandler('funding', btc_funding))
-    dispatcher.add_handler(CommandHandler('cancel_all_orders', bitmex_cancel_orders))
+    dispatcher.add_handler(
+        CommandHandler('cancel_all_orders', bitmex_cancel_orders))
     dispatcher.add_handler(CommandHandler('manga', manga))
+    dispatcher.add_handler(
+        CommandHandler('currency', currency_converter, pass_args=True))
 
     logging.info(dispatcher)
 
@@ -53,12 +57,13 @@ def main():
 
 def start(bot, update):
     logging.info('Start requested.')
-    bot.send_message(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
+    bot.send_message(chat_id=update.message.chat_id, 
+        text="I'm a bot, please talk to me!")
 
 
 def help(bot, update):
-    command_list = ['/start', '/manga', '/btc', '/last_price',
-                    '/funding', '/bitmex_cancel_orders'
+    command_list = ['/start', '/manga', '/btc', '/funding', 
+                    '/bitmex_cancel_orders'
                     ]
     logging.info('Help requested.')
     text = 'You can use the following commands:\n'
@@ -71,42 +76,40 @@ def help(bot, update):
 def btc(bot, update):
     logging.info('BTC information requested.')
     requ = bitmex.get_funding('XBTUSD')
-    text = 'XBT/USD last price: {}\nNext funding rate: {}\nPredicted funding rate: {}'.format(
-        bitmex.get_last_price('BTC/USD'),
-        requ['fundingRate'],
-        requ['indicativeFundingRate']
-        )
-
+    text = 'XBT/USD last price: {}\nNext funding rate: {}' \
+            '\nPredicted funding rate: {}'.format(
+                bitmex.get_last_price('BTC/USD'),
+                requ['fundingRate'],
+                requ['indicativeFundingRate'])
     bot.send_message(chat_id=update.message.chat_id, text=text)    
 
-def btc_last_price(bot, update):
-    logging.info('Last Price requested.')
-    last_price = 'XBT/USD last price: {}'.format(bitmex.get_last_price('BTC/USD'))
-    bot.send_message(chat_id=update.message.chat_id, text=last_price)
-
-
-def btc_funding(bot, update):
-    logging.info('Funding requested.')
-    requ = bitmex.get_funding('XBTUSD')
-
-    text = '{}\nNext funding rate: {}\nPredicted funding rate: {}'.format(
-        requ['symbol'], 
-        requ['fundingRate'],
-        requ['indicativeFundingRate']
-        )
-    bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
 def bitmex_cancel_orders(bot, update):
     logging.info('Cancel all orders requested.')
     bitmex.cancel_all_orders()
-    bot.send_message(chat_id=update.message.chat_id, text='All open orders cancelled.')
+    bot.send_message(chat_id=update.message.chat_id, 
+        text='All open orders cancelled.')
 
 
 def manga(bot, update):
     logging.info('Manga updates requested.')
     manga_update = msfeed.check_manga()
     bot.send_message(chat_id=update.message.chat_id, text=manga_update)
+
+
+def currency_converter(bot, update, args):
+    logging.info('Currency conversion requested.')
+    if hasattr(ssl, '_create_unverified_context'):
+        ssl._create_default_https_context = ssl._create_unverified_context
+    logging.debug(args)
+    value = int(args[0])
+    scurrency = args[1].upper()
+    tcurrency = args[2].upper()
+    c = CurrencyConverter('http://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip')
+    result = c.convert(value, scurrency, tcurrency)
+    text = '{0} {1} = {2:.2f} {3}'.format(value, scurrency, result, tcurrency)
+    bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
 if __name__ == '__main__':
