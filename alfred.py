@@ -8,7 +8,7 @@ from telegram.ext import Updater
 from telegram.ext import CommandHandler
 
 import bitmexmanager as bitmex
-import msfeed
+import mangafeed
 from curconverter import currency_converter as c
 
 def main():
@@ -94,7 +94,7 @@ def bitmex_cancel_orders(bot, update):
 
 def manga(bot, update):
     logging.info('Manga updates requested.')
-    manga_update = msfeed.check_manga()
+    manga_update = mangafeed.check_manga()
     text = ''
     logging.debug(manga_update)
     for item in manga_update:
