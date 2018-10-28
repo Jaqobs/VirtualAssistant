@@ -14,15 +14,16 @@ def check_manga():
     temp_list = []
     #check feed
     for item in feed.entries:
-      if (str(item.title).split("-")[0] not in temp_list):
-        res.append({'title' : str(item.title), 
-                     'timestamp' : str(item.updated), 'url' : str(item.link)
-                            })
-        temp_list.append(str(item.title).split("-")[0])
-        logging.debug('{} - last updated: {}'.format(str(item.title), 
-                                                            str(item.updated)))
-      else:
-        logging.debug('{} already in list'.format(str(item.title)))
-        continue
+        if (len(res) < 5):
+          if (str(item.title).split("-")[0] not in temp_list):
+            res.append({'title' : str(item.title), 
+                         'timestamp' : str(item.updated), 'url' : str(item.link)
+                                })
+            temp_list.append(str(item.title).split("-")[0])
+            logging.debug('{} - last updated: {}'.format(str(item.title), 
+                                                                str(item.updated)))
+          else:
+            logging.debug('{} already in list'.format(str(item.title)))
+            continue
                 
     return res
