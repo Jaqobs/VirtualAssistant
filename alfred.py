@@ -76,11 +76,11 @@ def help(bot, update):
 def btc(bot, update):
     logging.info('BTC information requested.')
     requ = bitmex.get_funding('XBTUSD')
-    text = 'XBT/USD last price: {}\nNext funding rate: {}' \
-            '\nPredicted funding rate: {}'.format(
+    text = 'XBT/USD last price: {0}\nNext funding rate: {1:.4f}%' \
+            '\nPredicted funding rate: {2:.4f}%'.format(
                 bitmex.get_last_price('BTC/USD'),
-                requ['fundingRate'],
-                requ['indicativeFundingRate'])
+                requ['fundingRate'] * 100,
+                requ['indicativeFundingRate'] * 100)
     bot.send_message(chat_id=update.message.chat_id, text=text)    
 
 
