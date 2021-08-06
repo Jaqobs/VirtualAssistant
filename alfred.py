@@ -7,8 +7,6 @@ import ssl
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
 
-import bitmexmanager as bitmex
-import mangafeed
 from curconverter import currency_converter as c
 
 def main():
@@ -29,9 +27,6 @@ def main():
     logging.info('Virtual Assistent started.')
     logging.info('Working directory: {}'.format(dname))
 
-    cp = configparser.RawConfigParser()  
-    logging.debug('Read config.txt')
-    cp.read('config.txt')
 
     #create updater and pass token
     logging.debug('Pass API token to Updater')
@@ -44,9 +39,6 @@ def main():
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('help', help))
     dispatcher.add_handler(CommandHandler('btc', btc))
-    dispatcher.add_handler(
-        CommandHandler('cancel_all_orders', bitmex_cancel_orders))
-    dispatcher.add_handler(CommandHandler('manga', manga))
     dispatcher.add_handler(
         CommandHandler('currency', currency_converter, pass_args=True))
 
@@ -62,8 +54,7 @@ def start(bot, update):
 
 
 def help(bot, update):
-    command_list = ['/manga', '/btc', '/currency value base target', 
-                    '/bitmex_cancel_orders'
+    command_list = ['/btc', '/currency value base target'
                     ]
     logging.info('Help requested.')
     text = 'You can use the following commands:\n'
@@ -75,7 +66,7 @@ def help(bot, update):
 
 def btc(bot, update):
     logging.info('BTC information requested.')
-    requ = bitmex.get_funding('XBTUSD')
+    requ = ""
     text = 'XBT/USD last price: {0}\nNext funding rate: {1:.4f}%' \
             '\nPredicted funding rate: {2:.4f}%'.format(
                 bitmex.get_last_price('BTC/USD'),
@@ -83,26 +74,6 @@ def btc(bot, update):
                 requ['indicativeFundingRate'] * 100)
     bot.send_message(chat_id=update.message.chat_id, text=text)    
 
-
-
-def bitmex_cancel_orders(bot, update):
-    logging.info('Cancel all orders requested.')
-    bitmex.cancel_all_orders()
-    bot.send_message(chat_id=update.message.chat_id, 
-        text='All open orders cancelled.')
-
-
-def manga(bot, update):
-    logging.info('Manga updates requested.')
-    manga_update = mangafeed.check_manga()
-    text = ''
-    logging.debug(manga_update)
-    for item in manga_update:
-        text += ('{0} - {1} \n{2} \n------\n'.format(item['title'], 
-                                                  item['timestamp'], 
-                                                  item['url']
-                                                 ))
-    bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
 def currency_converter(bot, update, args):
